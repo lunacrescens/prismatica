@@ -44,7 +44,12 @@ jobs:
           mkdir -p out
           cp -R "build/Prismatica Ripple Tank.saver" "build/Prismatica Ripple Tank HD.saver" out/
           for b in out/*.saver; do codesign --force --deep --sign - "$b"; done
-          lipo -info "out/Prismatica Ripple Tank.saver/Contents/MacOS/PrismaticaRippleTank"
+          # each bundle's program must match its Info.plist and contain both architectures
+          for b in out/*.saver; do
+            exe=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$b/Contents/Info.plist")
+            lipo "$b/Contents/MacOS/$exe" -verify_arch arm64 x86_64
+            lipo -info "$b/Contents/MacOS/$exe"
+          done
           # artifacts drop Unix permissions, so the bundles travel as a tarball
           tar -czf saver-macos.tgz -C out .
       - uses: actions/upload-artifact@v4    # handed to the Electron job, not released
