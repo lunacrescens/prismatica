@@ -2,8 +2,8 @@
 # under the exact names the website links to. Run it by hand (Actions > Release > Run workflow) to just build
 # and download the files without releasing.
 #
-# The Ripple Tank screensaver is built by the native jobs and packed into every desktop zip (Full and Native),
-# in a "Screensaver" folder. It isn't released on its own.
+# The Ripple Tank screensaver is built first and packed into every desktop zip, in a "Screensaver" folder.
+# It isn't released on its own.
 name: Release
 
 on:
@@ -15,72 +15,47 @@ permissions:
   contents: write
 
 jobs:
-  native-windows:
-    name: Native + screensaver (Windows)
+  screensaver-windows:
+    name: Screensaver (Windows)
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - name: Build
         run: |
-          cmake -S native -B build -A x64
+          cmake -S screensaver -B build -A x64
           cmake --build build --config Release --parallel
-      - name: Package
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force out/Prismatica/Screensaver, out/saver | Out-Null
-          Copy-Item build/Release/Prismatica.exe out/Prismatica/
-          Copy-Item native/res/README-dist.txt out/Prismatica/README.txt
-          Copy-Item "build/Release/Prismatica Ripple Tank.scr" out/Prismatica/Screensaver/
-          Copy-Item native/res/README-saver-windows.txt out/Prismatica/Screensaver/README.txt
-          Compress-Archive -Path out/Prismatica -DestinationPath out/Prismatica-Native-Windows-x64.zip
-          Copy-Item "build/Release/Prismatica Ripple Tank.scr" out/saver/
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist-native-windows
-          path: out/*.zip
-          if-no-files-found: error
       - uses: actions/upload-artifact@v4    # handed to the Electron job, not released
         with:
           name: saver-windows
-          path: out/saver/
+          path: build/Release/Prismatica Ripple Tank.scr
           if-no-files-found: error
 
-  native-macos:
-    name: Native + screensaver (macOS universal)
+  screensaver-macos:
+    name: Screensaver (macOS universal)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Build (Intel + Apple Silicon)
         run: |
-          cmake -S native -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          cmake -S screensaver -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           cmake --build build --parallel
-      - name: Sign (ad-hoc) and package
+      - name: Sign (ad-hoc) and pack
         run: |
-          mkdir -p out/app/Screensaver out/saver
-          cp -R build/Prismatica.app out/app/
-          cp -R "build/Prismatica Ripple Tank.saver" "build/Prismatica Ripple Tank HD.saver" out/saver/
-          for b in out/app/Prismatica.app out/saver/*.saver; do codesign --force --deep --sign - "$b"; done
-          lipo -info out/app/Prismatica.app/Contents/MacOS/Prismatica
-          cp -R out/saver/*.saver out/app/Screensaver/
-          cp native/res/README-dist.txt out/app/README.txt
-          cp native/res/README-saver-mac.txt out/app/Screensaver/README.txt
-          (cd out/app && zip -qry9 ../Prismatica-Native-Mac-Universal.zip Prismatica.app README.txt Screensaver)
+          mkdir -p out
+          cp -R "build/Prismatica Ripple Tank.saver" "build/Prismatica Ripple Tank HD.saver" out/
+          for b in out/*.saver; do codesign --force --deep --sign - "$b"; done
+          lipo -info "out/Prismatica Ripple Tank.saver/Contents/MacOS/PrismaticaRippleTank"
           # artifacts drop Unix permissions, so the bundles travel as a tarball
-          tar -czf out/saver-macos.tgz -C out/saver .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist-native-macos
-          path: out/*.zip
-          if-no-files-found: error
+          tar -czf saver-macos.tgz -C out .
       - uses: actions/upload-artifact@v4    # handed to the Electron job, not released
         with:
           name: saver-macos
-          path: out/saver-macos.tgz
+          path: saver-macos.tgz
           if-no-files-found: error
 
   electron-windows:
     name: Electron (Windows)
-    needs: native-windows
+    needs: screensaver-windows
     runs-on: windows-latest
     defaults:
       run:
@@ -108,7 +83,7 @@ jobs:
 
   electron-macos:
     name: Electron (macOS)
-    needs: native-macos
+    needs: screensaver-macos
     runs-on: macos-latest
     defaults:
       run:
@@ -150,7 +125,7 @@ jobs:
   release:
     name: Publish release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [native-windows, native-macos, electron-windows, electron-macos, browser]
+    needs: [electron-windows, electron-macos, browser]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -164,15 +139,14 @@ jobs:
           files: files/*
           generate_release_notes: true
           body: |
-            **Not sure which to get?** Take the **Electron** build for your system: it has every feature (lyrics, settings menu).
-            The **Native** build is tiny and runs on older Macs whose graphics Chromium no longer supports.
-            Or skip the download: [run it in your browser](https://lunacrescens.github.io/prismatica/play/).
+            Download Prismatica for your system, or [try it in your browser](https://lunacrescens.github.io/prismatica/play/) with your own music files.
+            The desktop app adds system audio and microphone input.
 
             | | Windows | macOS |
             |---|---|---|
-            | Electron (recommended) | `Prismatica-Electron-Windows-x64.zip` | `Prismatica-Electron-Mac-AppleSilicon-arm64.zip` / `Prismatica-Electron-Mac-Intel-x64.zip` |
-            | Native | `Prismatica-Native-Windows-x64.zip` | `Prismatica-Native-Mac-Universal.zip` |
+            | Prismatica | `Prismatica-Electron-Windows-x64.zip` | `Prismatica-Electron-Mac-AppleSilicon-arm64.zip` (Apple Silicon) / `Prismatica-Electron-Mac-Intel-x64.zip` (Intel) |
+            | Browser version | `Prismatica.html` | `Prismatica.html` |
 
-            Every desktop download includes the **Ripple Tank screensaver** in its `Screensaver` folder.
+            Each download includes the **Ripple Tank screensaver** in its `Screensaver` folder.
 
             The apps aren't signed with a paid certificate. Windows: More info → Run anyway. macOS: System Settings → Privacy & Security → Open Anyway.

@@ -82,6 +82,8 @@ body.idle #lynone{opacity:0;pointer-events:none}
 #settingsPanel .hint{margin:4px 0 2px;font-size:11px;opacity:.5}
 #settingsBtn{font-size:15px;line-height:1}
 
+#welcome p.getapp{margin:22px 0 0;font-size:13px;opacity:.6}
+#welcome p.getapp a{color:inherit}
 </style>
 </head>
 <body>
@@ -102,18 +104,15 @@ body.idle #lynone{opacity:0;pointer-events:none}
   <p>Pick something to listen to</p>
   <div class="choices">
     <button data-src="files"><b>Open music</b><span>MP3, FLAC, WAV, OGG, M4A — or drop files anywhere</span></button>
-    <button data-src="system"><b>System audio</b><span>Share a tab or screen with audio (Chrome / Edge)</span></button>
-    <button data-src="mic"><b>Microphone</b><span>React to the room or a line-in</span></button>
     <button data-src="demo"><b>Demo track</b><span>Built-in generated loop</span></button>
   </div>
+  <p class="getapp">Want it to react to Spotify, YouTube or a microphone? <a href="https://lunacrescens.github.io/prismatica/download.html" target="_blank" rel="noopener">Get the desktop app</a></p>
 </div>
 
 <div id="bar">
   <div class="row">
     <div class="group">
       <button data-src="files" title="Open music files (O)">Open</button>
-      <button data-src="system" title="Capture system audio">System</button>
-      <button data-src="mic" title="Microphone">Mic</button>
       <button data-src="demo" title="Demo track">Demo</button>
     </div>
     <div class="group grow" id="transport">
@@ -1167,11 +1166,9 @@ window.prismatica = {
     try {
       if (src === 'files') return $('file').click();
       Lyrics.clear(); $('lynone').hidden = true; closeSearch();
-      if (src === 'system') { await Audio.useSystem(); $('title').textContent = 'System audio'; }
-      if (src === 'mic') { await Audio.useMic(); $('title').textContent = 'Microphone'; }
       if (src === 'demo') { $('title').textContent = 'Rendering demo…'; await Audio.useDemo(); $('title').textContent = 'Demo track'; }
       markSource(); $('play').innerHTML = '&#10074;&#10074;';
-    } catch (e) { toast(src === 'system' ? 'System audio: pick a tab or screen and turn on "Share audio" (Chrome / Edge only)' : 'Could not start: ' + e.message); }
+    } catch (e) { toast(src === 'system' ? 'System audio capture was not allowed or is unavailable' : 'Could not start: ' + e.message); }
   }
   document.querySelectorAll('[data-src]').forEach((b) => b.addEventListener('click', () => pick(b.dataset.src)));
   $('file').addEventListener('change', (e) => { addFiles(e.target.files); e.target.value = ''; });

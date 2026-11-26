@@ -44,7 +44,7 @@ window.prismatica = {
 })();
 """
 
-# ---- renderer: no Electron relaunch on WebGL failure, and system audio is a browser share ----
+# ---- renderer: no Electron relaunch on WebGL failure ----
 renderer = rd('renderer.js')
 renderer = must(renderer, "if (!SOFT && !SHOT) location.hash = 'nogl';   // main process relaunches with software rendering\n", '', 'no relaunch')
 renderer = re.sub(r"document\.body\.innerHTML = '<p style=\"padding:40px\">' \+ \(SOFT \?.*?\) \+ '</p>';",
@@ -52,14 +52,23 @@ renderer = re.sub(r"document\.body\.innerHTML = '<p style=\"padding:40px\">' \+ 
     "Try a different browser, or turn on hardware acceleration in its settings. On Macs where Chrome\\'s WebGL is broken, Safari or Firefox may still work.</p>';",
     renderer, count=1, flags=re.S)
 if "Prismatica needs WebGL 2" not in renderer: sys.exit('patch failed: WebGL message')
-renderer = must(renderer, "toast(src === 'system' ? 'System audio capture was not allowed or is unavailable'",
-    "toast(src === 'system' ? 'System audio: pick a tab or screen and turn on \"Share audio\" (Chrome / Edge only)'", 'system audio hint')
+# the browser version plays music files and the demo; system audio and the microphone are desktop-app only
+renderer = must(renderer, "      if (src === 'system') { await Audio.useSystem(); $('title').textContent = 'System audio'; }\n", '', 'no system audio')
+renderer = must(renderer, "      if (src === 'mic') { await Audio.useMic(); $('title').textContent = 'Microphone'; }\n", '', 'no microphone')
 
 # ---- page ----
 html = rd('index.html')
 html = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\n', '', html)   # inline scripts + LRCLIB need a looser policy than the app's
 html = must(html, '<link rel="stylesheet" href="style.css">', '<style>\n' + rd('style.css') + '\n</style>', 'inline css')
-html = must(html, '<span>Visualize whatever your computer is playing</span>', '<span>Share a tab or screen with audio (Chrome / Edge)</span>', 'welcome text')
+html = must(html, '    <button data-src="system"><b>System audio</b><span>Visualize whatever your computer is playing</span></button>\n', '', 'welcome: no system audio')
+html = must(html, '    <button data-src="mic"><b>Microphone</b><span>React to the room or a line-in</span></button>\n', '', 'welcome: no microphone')
+html = must(html, '      <button data-src="system" title="Capture system audio">System</button>\n', '', 'bar: no system audio')
+html = must(html, '      <button data-src="mic" title="Microphone">Mic</button>\n', '', 'bar: no microphone')
+html = must(html, '  </div>\n</div>\n\n<div id="bar">',
+    '  </div>\n  <p class="getapp">Want it to react to Spotify, YouTube or a microphone? '
+    '<a href="https://lunacrescens.github.io/prismatica/download.html" target="_blank" rel="noopener">Get the desktop app</a></p>\n'
+    '</div>\n\n<div id="bar">', 'desktop app note')
+html = must(html, '</style>', '#welcome p.getapp{margin:22px 0 0;font-size:13px;opacity:.6}\n#welcome p.getapp a{color:inherit}\n</style>', 'note style')
 scripts = [('shaders.js', rd('shaders.js')), ('audio.js', rd('audio.js')), ('lyrics.js', rd('lyrics.js')), (None, shim), ('renderer.js', renderer)]
 tags = re.findall(r'<script src="[^"]+"></script>\n?', html)
 if len(tags) != 4: sys.exit(f'expected 4 script tags, found {len(tags)}')

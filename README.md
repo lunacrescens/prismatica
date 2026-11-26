@@ -23,11 +23,10 @@
 
 | | Windows | macOS |
 |---|---|---|
-| **Prismatica** (recommended): every feature, including lyrics and settings | [Windows x64](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Windows-x64.zip) | [Apple Silicon](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-AppleSilicon-arm64.zip) · [Intel](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-Intel-x64.zip) |
-| **Prismatica Native**: tiny, and runs on older Macs whose graphics Chromium no longer supports | [Windows x64](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Native-Windows-x64.zip) | [Universal](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Native-Mac-Universal.zip) |
-| **Browser**: no install | [Open it](https://lunacrescens.github.io/prismatica/play/) | [Open it](https://lunacrescens.github.io/prismatica/play/) |
+| **Prismatica**: every feature, including system audio, microphone, lyrics and settings | [Windows x64](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Windows-x64.zip) | [Apple Silicon](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-AppleSilicon-arm64.zip) · [Intel](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-Intel-x64.zip) |
+| **Browser**: no install; plays your own music files | [Open it](https://lunacrescens.github.io/prismatica/play/) | [Open it](https://lunacrescens.github.io/prismatica/play/) |
 
-Both desktop downloads include the **Ripple Tank screensaver**, a calm, silent version of one scene, in a `Screensaver` folder next to the app (`.scr` on Windows, `.saver` on macOS).
+The download includes the **Ripple Tank screensaver**, a calm, silent version of one scene, in a `Screensaver` folder next to the app (`.scr` on Windows, `.saver` on macOS).
 
 The apps aren't signed with a paid certificate yet. **Windows:** More info → Run anyway. **macOS:** System Settings → Privacy & Security → Open Anyway (or `xattr -cr /Applications/Prismatica.app`).
 
@@ -42,7 +41,7 @@ Every scene is a stack of layers (oscilloscopes, spectrum rings, rose curves, pa
 
 ## Features
 
-- **Listen to anything**: music files (MP3, FLAC, WAV, OGG, M4A; drop files or whole folders on the window), whatever your computer is playing, a microphone or line-in, or the built-in demo track.
+- **Listen to anything**: music files (MP3, FLAC, WAV, OGG, M4A; drop files or whole folders on the window), whatever your computer is playing, a microphone or line-in, or the built-in demo track. The browser version plays music files and the demo track; system audio and the microphone are in the desktop app.
 - **Reacts to the music**: bass, mids and highs each drive their own layers; beat detection fires shockwaves and scene changes.
 - **Synced lyrics**: line-by-line lyrics from a `.lrc` file next to the song, the file's own tags, or [LRCLIB](https://lrclib.net). Search by hand when a song isn't matched; nudge timing with `[` and `]`.
 - **Out of the way**: controls and cursor fade out after a few seconds; double-click for fullscreen; a small settings menu (`,`) remembers your choices.
@@ -56,18 +55,16 @@ Every scene is a stack of layers (oscilloscopes, spectrum rings, rose curves, pa
 | `Y` | Lyrics on / off | `S` | Search lyrics |
 | `,` | Settings | `?` | All keys |
 
-Lyrics and the settings menu are in the Electron and browser versions; the native version has the scenes, audio sources and keys.
-
 ## What's in this repository
 
 ```
-electron/   The main app: Electron + WebGL 2. Also the source of the browser version.
-native/     The native app (C++17, OpenGL 3.3, CMake) and the Ripple Tank screensaver, which ships in both desktop zips.
-website/    The website (plain static files), published to GitHub Pages.
-.github/    Workflows: build every download on a version tag, publish the website on push.
+electron/      The app: Electron + WebGL 2. Also the source of the browser version.
+screensaver/   The Ripple Tank screensaver (C++17, OpenGL, CMake), which ships inside the app's download.
+website/       The website (plain static files), published to GitHub Pages.
+.github/       Workflows: build every download on a version tag, publish the website on push.
 ```
 
-Both apps share the same scenes and shaders: `electron/shaders.js` and `native/src/shaders.h` hold the same GLSL.
+The screensaver's shaders in `screensaver/src/shaders.h` are the same GLSL as `electron/shaders.js`.
 
 ## Building
 
@@ -84,21 +81,20 @@ npm run dist:mac      # dist/Prismatica-Electron-Mac-*.zip (build on a Mac so th
 npm run html          # rebuild the browser version into website/play/index.html (needs Python 3)
 ```
 
-### Native app and screensaver
+### Screensaver
 
-Needs [CMake](https://cmake.org/) 3.21+ and a C++17 compiler: Visual Studio 2022 on Windows, Xcode command-line tools on macOS, GCC or Clang on Linux. CMake downloads GLFW, Dear ImGui, miniaudio and portable-file-dialogs itself.
+Needs [CMake](https://cmake.org/) 3.21+ and a C++17 compiler: Visual Studio 2022 on Windows, Xcode command-line tools on macOS, GCC or Clang on Linux. CMake downloads GLFW itself.
 
 ```sh
-cd native
+cd screensaver
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 ```
 
 - **macOS universal build** (Intel + Apple Silicon): add `-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"`.
-- **Linux** needs the X11 and OpenGL headers, e.g. `sudo apt install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev`.
-- **Skip the screensaver** with `-DPRISMATICA_BUILD_SAVER=OFF`.
+- **Linux** builds a windowed test version (`prismatica_saver_test -w`) and needs the X11 and OpenGL headers, e.g. `sudo apt install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev`.
 
-Output: `Prismatica.exe` and `Prismatica Ripple Tank.scr` (Windows), `Prismatica.app` and two `.saver` bundles (macOS), `prismatica` (Linux).
+Output: `Prismatica Ripple Tank.scr` (Windows) or two `.saver` bundles (macOS). Point `SCREENSAVER_DIR` at that folder when running `npm run dist:*` to pack it into the app's zip.
 
 ## Releasing
 

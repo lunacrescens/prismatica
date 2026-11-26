@@ -5,7 +5,7 @@
 // macOS apps are ad-hoc signed when built on a Mac (needed to launch on Apple Silicon). Zipping uses the
 // system's zip tool (tar on Windows 10+).
 //
-// The Ripple Tank screensaver (built from native/) ships inside each zip, in a "Screensaver" folder.
+// The Ripple Tank screensaver (built from screensaver/) ships inside each zip, in a "Screensaver" folder.
 // Point SCREENSAVER_DIR at a folder holding it:
 //   Windows zip: "Prismatica Ripple Tank.scr"
 //   macOS zips:  "Prismatica Ripple Tank.saver" and "Prismatica Ripple Tank HD.saver"
@@ -37,7 +37,7 @@ function addScreensaver(platform, dest) {
     if (!fs.existsSync(from)) throw new Error(`screensaver file missing: ${from}`);
     fs.cpSync(from, path.join(into, f), { recursive: true, verbatimSymlinks: true });
   }
-  fs.copyFileSync(path.join(root, '..', 'native', 'res', SAVER_README[platform]), path.join(into, 'README.txt'));
+  fs.copyFileSync(path.join(root, '..', 'screensaver', 'res', SAVER_README[platform]), path.join(into, 'README.txt'));
   return true;
 }
 
