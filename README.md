@@ -21,14 +21,14 @@
 
 ## Download
 
-| | Windows | macOS |
-|---|---|---|
-| **Prismatica**: every feature, including system audio, microphone, lyrics and settings | [Windows x64](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Windows-x64.zip) | [Apple Silicon](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-AppleSilicon-arm64.zip) · [Intel](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-Intel-x64.zip) |
-| **Browser**: no install; plays your own music files | [Open it](https://lunacrescens.github.io/prismatica/play/) | [Open it](https://lunacrescens.github.io/prismatica/play/) |
+| | Windows | macOS | Linux |
+|---|---|---|---|
+| **Prismatica**: every feature, including system audio, microphone, lyrics and settings | [Windows x64](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Windows-x64.zip) | [Apple Silicon](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-AppleSilicon-arm64.zip) · [Intel](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-Intel-x64.zip) | [x64 (.tar.gz)](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Linux-x64.tar.gz) |
+| **Browser**: no install; plays your own music files | [Open it](https://lunacrescens.github.io/prismatica/play/) | [Open it](https://lunacrescens.github.io/prismatica/play/) | [Open it](https://lunacrescens.github.io/prismatica/play/) |
 
-The download includes the **Ripple Tank screensaver**, a calm, silent version of one scene, in a `Screensaver` folder next to the app (`.scr` on Windows, `.saver` on macOS).
+The Windows and macOS downloads include the **Ripple Tank screensaver**, a calm, silent version of one scene, in a `Screensaver` folder next to the app (`.scr` on Windows, `.saver` on macOS).
 
-The apps aren't signed with a paid certificate yet. **Windows:** More info → Run anyway. **macOS:** System Settings → Privacy & Security → Open Anyway (or `xattr -cr /Applications/Prismatica.app`).
+The apps aren't signed with a paid certificate yet. **Windows:** More info → Run anyway. **macOS:** System Settings → Privacy & Security → Open Anyway (or `xattr -cr /Applications/Prismatica.app`). **Linux:** extract and run `./Prismatica`; `./add-to-menu.sh` adds it to your app menu. If it complains about the "SUID sandbox helper" (Ubuntu 23.10+), run `sudo chown root:root chrome-sandbox && sudo chmod 4755 chrome-sandbox` in its folder.
 
 ## Scenes
 
@@ -78,6 +78,7 @@ npm install
 npm start             # run it
 npm run dist:win      # dist/Prismatica-Electron-Windows-x64.zip (set SCREENSAVER_DIR to include the screensaver; see scripts/package.js)
 npm run dist:mac      # dist/Prismatica-Electron-Mac-*.zip (build on a Mac so the apps get signed)
+npm run dist:linux    # dist/Prismatica-Electron-Linux-x64.tar.gz
 npm run html          # rebuild the browser version into website/play/index.html (needs Python 3)
 ```
 

@@ -41,6 +41,7 @@ function createWindow() {
     minWidth: 640, minHeight: 360,
     backgroundColor: '#000000',
     title: 'Prismatica',
+    icon: process.platform === 'linux' ? path.join(__dirname, 'build', 'icon.png') : undefined,   // Windows/Mac use the app's own icon
     autoHideMenuBar: true,
     show: !SHOT_DIR,
     webPreferences: { contextIsolation: true, nodeIntegration: false, backgroundThrottling: false, offscreen: false, preload: path.join(__dirname, 'preload.js') },

@@ -115,6 +115,27 @@ jobs:
           path: electron/dist/*.zip
           if-no-files-found: error
 
+  electron-linux:
+    name: Electron (Linux)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: electron
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: electron/package-lock.json
+      - run: npm ci
+      - run: npm run dist:linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-electron-linux
+          path: electron/dist/*.tar.gz
+          if-no-files-found: error
+
   browser:
     name: Browser version (single HTML file)
     runs-on: ubuntu-latest
@@ -130,7 +151,7 @@ jobs:
   release:
     name: Publish release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [electron-windows, electron-macos, browser]
+    needs: [electron-windows, electron-macos, electron-linux, browser]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -147,11 +168,11 @@ jobs:
             Download Prismatica for your system, or [try it in your browser](https://lunacrescens.github.io/prismatica/play/) with your own music files.
             The desktop app adds system audio and microphone input.
 
-            | | Windows | macOS |
-            |---|---|---|
-            | Prismatica | `Prismatica-Electron-Windows-x64.zip` | `Prismatica-Electron-Mac-AppleSilicon-arm64.zip` (Apple Silicon) / `Prismatica-Electron-Mac-Intel-x64.zip` (Intel) |
-            | Browser version | `Prismatica.html` | `Prismatica.html` |
+            | | Windows | macOS | Linux |
+            |---|---|---|---|
+            | Prismatica | `Prismatica-Electron-Windows-x64.zip` | `Prismatica-Electron-Mac-AppleSilicon-arm64.zip` (Apple Silicon) / `Prismatica-Electron-Mac-Intel-x64.zip` (Intel) | `Prismatica-Electron-Linux-x64.tar.gz` |
+            | Browser version | `Prismatica.html` | `Prismatica.html` | `Prismatica.html` |
 
-            Each download includes the **Ripple Tank screensaver** in its `Screensaver` folder.
+            The Windows and macOS downloads include the **Ripple Tank screensaver** in a `Screensaver` folder.
 
-            The apps aren't signed with a paid certificate. Windows: More info → Run anyway. macOS: System Settings → Privacy & Security → Open Anyway.
+            The apps aren't signed with a paid certificate. Windows: More info → Run anyway. macOS: System Settings → Privacy & Security → Open Anyway. Linux: see README.txt in the download if it won't start.
