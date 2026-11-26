@@ -2,19 +2,15 @@
 
 Prismatica is MIT-licensed (see [LICENSE](LICENSE)). It builds on these projects, each under its own license.
 
-## Native app and screensaver (`native/`)
+## Ripple Tank screensaver (`screensaver/`)
 
 | Project | Used for | License |
 |---|---|---|
-| [GLFW](https://www.glfw.org/) 3.4 | Windows, OpenGL context, input | zlib/libpng |
-| [Dear ImGui](https://github.com/ocornut/imgui) 1.91.5 | On-screen controls | MIT |
-| [miniaudio](https://miniaud.io/) 0.11.22 | Audio playback, capture, decoding | Public domain (Unlicense) or MIT No Attribution |
-| [stb_vorbis](https://github.com/nothings/stb), stb_image_write | Ogg Vorbis decoding, screenshots | Public domain or MIT |
-| [portable-file-dialogs](https://github.com/samhocevar/portable-file-dialogs) | Open-file dialog | WTFPL |
-| [glad](https://github.com/Dav1dde/glad) (generated loader in `native/third_party/glad`) | OpenGL function loading | Generated code: public domain / CC0; Khronos specification: Apache 2.0 |
-| [Roboto](https://fonts.google.com/specimen/Roboto) (embedded in `native/src/font_roboto.h`) | UI font | Apache 2.0 |
+| [GLFW](https://www.glfw.org/) 3.4 | Windows, OpenGL context, input (Windows) | zlib/libpng |
+| stb_image_write (bundled with GLFW) | Test screenshots (Linux build only) | Public domain or MIT |
+| [glad](https://github.com/Dav1dde/glad) (generated loader in `screensaver/third_party/glad`) | OpenGL function loading | Generated code: public domain / CC0; Khronos specification: Apache 2.0 |
 
-GLFW, Dear ImGui, miniaudio and portable-file-dialogs are downloaded by CMake at build time and are not stored in this repository.
+GLFW is downloaded by CMake at build time and is not stored in this repository.
 
 ## Electron app (`electron/`)
 

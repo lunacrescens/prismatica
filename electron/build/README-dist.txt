@@ -1,6 +1,5 @@
-PRISMATICA (Electron / WebGL build) - psychedelic music visualizer
-==================================================================
-There is also a native C++/OpenGL build of Prismatica that looks the same; use it if this one is slow.
+PRISMATICA - psychedelic music visualizer
+=========================================
 
 GPU FALLBACK  If WebGL can't start on your graphics card (e.g. OCLP-patched Macs), Prismatica
               restarts itself in software rendering and remembers that. It works, but at a lower
