@@ -25,8 +25,9 @@
 |---|---|---|
 | **Prismatica** (recommended): every feature, including lyrics and settings | [Windows x64](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Windows-x64.zip) | [Apple Silicon](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-AppleSilicon-arm64.zip) · [Intel](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Electron-Mac-Intel-x64.zip) |
 | **Prismatica Native**: tiny, and runs on older Macs whose graphics Chromium no longer supports | [Windows x64](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Native-Windows-x64.zip) | [Universal](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-Native-Mac-Universal.zip) |
-| *Extra:* **Ripple Tank screensaver**, a calm, silent version of one scene to go with the app | [.scr](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-RippleTank-Screensaver-Windows.zip) | [.saver](https://github.com/lunacrescens/prismatica/releases/latest/download/Prismatica-RippleTank-Screensaver-Mac.zip) |
 | **Browser**: no install | [Open it](https://lunacrescens.github.io/prismatica/play/) | [Open it](https://lunacrescens.github.io/prismatica/play/) |
+
+Both desktop downloads include the **Ripple Tank screensaver**, a calm, silent version of one scene, in a `Screensaver` folder next to the app (`.scr` on Windows, `.saver` on macOS).
 
 The apps aren't signed with a paid certificate yet. **Windows:** More info → Run anyway. **macOS:** System Settings → Privacy & Security → Open Anyway (or `xattr -cr /Applications/Prismatica.app`).
 
@@ -61,7 +62,7 @@ Lyrics and the settings menu are in the Electron and browser versions; the nativ
 
 ```
 electron/   The main app: Electron + WebGL 2. Also the source of the browser version.
-native/     The native app (C++17, OpenGL 3.3, CMake) and the Ripple Tank screensaver.
+native/     The native app (C++17, OpenGL 3.3, CMake) and the Ripple Tank screensaver, which ships in both desktop zips.
 website/    The website (plain static files), published to GitHub Pages.
 .github/    Workflows: build every download on a version tag, publish the website on push.
 ```
@@ -78,7 +79,7 @@ Needs [Node.js](https://nodejs.org/) 20 or newer.
 cd electron
 npm install
 npm start             # run it
-npm run dist:win      # dist/Prismatica-Electron-Windows-x64.zip
+npm run dist:win      # dist/Prismatica-Electron-Windows-x64.zip (set SCREENSAVER_DIR to include the screensaver; see scripts/package.js)
 npm run dist:mac      # dist/Prismatica-Electron-Mac-*.zip (build on a Mac so the apps get signed)
 npm run html          # rebuild the browser version into website/play/index.html (needs Python 3)
 ```

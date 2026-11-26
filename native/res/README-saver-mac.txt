@@ -1,4 +1,4 @@
-PRISMATICA RIPPLE TANK SCREEN SAVER (macOS 10.15+, Intel and Apple Silicon)
+PRISMATICA RIPPLE TANK SCREEN SAVER (macOS 10.15+, Intel and Apple Silicon) - comes with Prismatica
 A calm, slow version of the Ripple Tank scene. No music, no sound, no settings.
 
 TWO VERSIONS - install either or both, they don't conflict:

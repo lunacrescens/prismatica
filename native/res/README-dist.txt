@@ -4,7 +4,10 @@ This is the native C++/OpenGL build: no Chromium inside, a few MB, and it runs o
 Macs whose GPU Chromium no longer supports (e.g. OCLP-patched Haswell/Broadwell Macs).
 It looks and behaves the same as the Electron/WebGL build.
 
-WINDOWS  Run Prismatica.exe (single file, nothing to install).
+SCREENSAVER  The Screensaver folder holds the Ripple Tank screensaver, a calm, silent version of
+             one scene. Its README.txt explains how to install it.
+
+WINDOWS  Run Prismatica.exe (one file, nothing to install).
          SmartScreen may warn because it's unsigned: More info -> Run anyway.
 
 MAC      Universal app (Intel + Apple Silicon), macOS 10.15 or newer.
