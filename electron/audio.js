@@ -37,7 +37,8 @@ const Audio = (() => {
     stream = s; srcNode = ctx.createMediaStreamSource(s); srcNode.connect(analyser); mode = m; // not routed to speakers
   }
   async function useSystem() {
-    const s = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    // No voice processing: on Linux, auto gain would turn the system-audio input down to almost nothing
+    const s = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
     s.getVideoTracks().forEach((t) => t.stop());
     if (!s.getAudioTracks().length) throw new Error('No system audio track was provided');
     useStream(new MediaStream(s.getAudioTracks()), 'system');

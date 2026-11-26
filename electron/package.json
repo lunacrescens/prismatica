@@ -13,6 +13,7 @@
     "dist": "node scripts/package.js",
     "dist:win": "node scripts/package.js win32-x64",
     "dist:mac": "node scripts/package.js darwin-arm64 darwin-x64",
+    "dist:linux": "node scripts/package.js linux-x64",
     "html": "python3 scripts/make-html.py ../website/play/index.html"
   },
   "devDependencies": {

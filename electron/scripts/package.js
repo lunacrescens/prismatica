@@ -2,6 +2,7 @@
 //   node scripts/package.js                      all targets
 //   node scripts/package.js win32-x64            just Windows
 //   node scripts/package.js darwin-arm64 darwin-x64
+//   node scripts/package.js linux-x64            (a .tar.gz; Linux has no screensaver)
 // macOS apps are ad-hoc signed when built on a Mac (needed to launch on Apple Silicon). Zipping uses the
 // system's zip tool (tar on Windows 10+).
 //
@@ -21,6 +22,7 @@ const ZIP_NAMES = {
   'win32-x64': 'Prismatica-Electron-Windows-x64.zip',
   'darwin-arm64': 'Prismatica-Electron-Mac-AppleSilicon-arm64.zip',
   'darwin-x64': 'Prismatica-Electron-Mac-Intel-x64.zip',
+  'linux-x64': 'Prismatica-Electron-Linux-x64.tar.gz',
 };
 const targets = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(ZIP_NAMES);
 const SAVER_DIR = process.env.SCREENSAVER_DIR ? path.resolve(process.env.SCREENSAVER_DIR) : null;
@@ -54,8 +56,8 @@ function zip(cwd, zipPath, items) {
     const [dir] = await packager({
       dir: root, out, overwrite: true, asar: true, prune: false,   // no runtime dependencies: leave node_modules out entirely
       name: 'Prismatica', platform, arch,
-      icon: path.join(root, 'build', platform === 'win32' ? 'icon.ico' : 'icon.icns'),
-      ignore: [/^\/dist($|\/)/, /^\/scripts($|\/)/, /^\/build($|\/)/, /^\/node_modules($|\/)/, /^\/saver($|\/)/, /^\/saver-macos\.tgz$/, /^\/package-lock\.json$/, /^\/\.[^/]+/],
+      icon: platform === 'linux' ? undefined : path.join(root, 'build', platform === 'win32' ? 'icon.ico' : 'icon.icns'),
+      ignore: [/^\/dist($|\/)/, /^\/scripts($|\/)/, /^\/build\/(?!icon\.png$)/, /^\/node_modules($|\/)/, /^\/saver($|\/)/, /^\/saver-macos\.tgz$/, /^\/package-lock\.json$/, /^\/\.[^/]+/],
       appBundleId: 'com.lunacrescens.prismatica', appCategoryType: 'public.app-category.music',
       appCopyright: 'Copyright (c) 2026 lunacrescens',
       win32metadata: { CompanyName: 'lunacrescens', FileDescription: 'Prismatica music visualizer', ProductName: 'Prismatica' },
@@ -72,6 +74,17 @@ function zip(cwd, zipPath, items) {
       const items = ['Prismatica.app', 'README.txt'];
       if (addScreensaver('darwin', dir)) items.push('Screensaver');
       zip(dir, zipPath, items);
+    } else if (platform === 'linux') {
+      // .tar.gz (keeps the executable bits) holding a "Prismatica" folder, with an icon and a menu-entry script
+      const staged = path.join(out, 'Prismatica');
+      fs.rmSync(staged, { recursive: true, force: true });
+      fs.cpSync(dir, staged, { recursive: true, verbatimSymlinks: true });
+      fs.copyFileSync(path.join(root, 'build', 'icon.png'), path.join(staged, 'prismatica.png'));
+      fs.copyFileSync(path.join(root, 'build', 'add-to-menu.sh'), path.join(staged, 'add-to-menu.sh'));
+      fs.chmodSync(path.join(staged, 'add-to-menu.sh'), 0o755);
+      fs.rmSync(zipPath, { force: true });
+      execFileSync('tar', ['-czf', zipPath, 'Prismatica'], { cwd: out, stdio: 'inherit' });
+      fs.rmSync(staged, { recursive: true, force: true });
     } else {
       // Windows zip holds a "Prismatica" folder
       const staged = path.join(out, 'Prismatica');

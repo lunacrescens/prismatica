@@ -6,7 +6,7 @@ GPU FALLBACK  If WebGL can't start on your graphics card (e.g. OCLP-patched Macs
               resolution and frame rate. To try the GPU again, launch it once with --force-gpu.
 
 SCREENSAVER  The Screensaver folder holds the Ripple Tank screensaver, a calm, silent version of
-             one scene. Its README.txt explains how to install it.
+             one scene. Its README.txt explains how to install it. (Windows and Mac only.)
 
 WINDOWS  Unzip the whole folder, run Prismatica.exe (keep it next to the other files).
          SmartScreen may warn because the app is unsigned: More info -> Run anyway.
@@ -17,10 +17,18 @@ MAC      Unzip, drag Prismatica.app to Applications.
            - Terminal:  xattr -cr /Applications/Prismatica.app
          Apple Silicon Macs: use the arm64 zip. Intel Macs: use the x64 zip.
 
+LINUX    Extract the archive and run ./Prismatica from the Prismatica folder (64-bit x86).
+         ./add-to-menu.sh adds it to your app menu (run it again if you move the folder).
+         If it won't start and complains about the "SUID sandbox helper" (Ubuntu 23.10 and newer
+         do this), run once in the Prismatica folder:
+           sudo chown root:root chrome-sandbox && sudo chmod 4755 chrome-sandbox
+
 AUDIO SOURCES
   Open music     MP3 / FLAC / WAV / OGG / M4A, or drag files onto the window
   System audio   whatever the computer is playing (Spotify, a browser, a game...)
                  Mac: needs macOS 14.2+ and asks for audio-capture permission once
+                 Linux: needs PulseAudio or PipeWire (the default on current distros);
+                 captures your default output device
   Microphone     room sound or line-in
   Demo track     built-in generated loop
 
@@ -38,6 +46,7 @@ LYRICS  (music files only - not System audio / Microphone)
   Timing off? [ and ] shift the lyrics 0.2s earlier/later (remembered per song), \ resets.
   Troubleshooting: every lookup is written to lyrics-log.txt in Prismatica's data folder
     Windows: %APPDATA%\Prismatica      Mac: ~/Library/Application Support/Prismatica
+    Linux: ~/.config/Prismatica
 
 KEYS
   Space        play / pause           Left / Right  previous / next scene
