@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prismatica — psychedelic music visualizer</title>
+<meta name="description" content="Prismatica is a free psychedelic music visualizer for Windows, macOS and the browser, in the spirit of the old iTunes and Windows Media Player visualizers.">
+<meta property="og:title" content="Prismatica — psychedelic music visualizer">
+<meta property="og:description" content="Prismatica is a free psychedelic music visualizer for Windows, macOS and the browser, in the spirit of the old iTunes and Windows Media Player visualizers.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lunacrescens.github.io/prismatica/">
+<meta property="og:image" content="https://lunacrescens.github.io/prismatica/video/showreel-poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://lunacrescens.github.io/prismatica/">
+<meta name="theme-color" content="#07070B">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#07070B}
+a{color:#7DF9E9;text-decoration:none}a:hover{color:#B8FFF6}
+.scene-card img{transition:transform .5s ease}
+.scene-card:hover img{transform:scale(1.04)}
+.navlink:hover{color:#FFFFFF}
+.btn-primary:hover{background:#B8FFF6}
+.btn-ghost:hover{background:rgba(255,255,255,0.12)}
+.dl-card:hover{border-color:rgba(125,249,233,0.5)}
+</style>
+<style>
+.hero{position:relative;overflow:hidden;isolation:isolate;min-height:min(86vh,880px);display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,0.07)}
+.hero-video,.hero-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.hero-shade{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse 70% 60% at 50% 46%,rgba(7,7,11,.72),rgba(7,7,11,.42) 70%),linear-gradient(180deg,rgba(7,7,11,.55) 0%,rgba(7,7,11,0) 22%,rgba(7,7,11,0) 70%,#07070B 100%)}
+.hero-inner{width:100%;text-shadow:0 2px 24px rgba(0,0,0,.55)}
+.hero-inner p{color:#E2E2EA!important}
+.hero-pause{position:absolute;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(7,7,11,.55);color:#F2F2F5;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px)}
+.hero-pause:hover{background:rgba(7,7,11,.8)}
+.hero-pause:focus-visible{outline:2px solid #7DF9E9;outline-offset:2px}
+.hero-pause .i-play{display:none}.hero-pause[aria-pressed="true"] .i-play{display:block}.hero-pause[aria-pressed="true"] .i-pause{display:none}
+.hero .btn-ghost{background:rgba(7,7,11,.45);backdrop-filter:blur(6px)}
+@media (prefers-reduced-motion: reduce){.hero-video{display:none}}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; background: #07070B; color: #F2F2F5; font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 1.6">
+
+<header style="position: sticky; top: 0; z-index: 10; background: rgba(7,7,11,0.82); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.07)">
+<nav aria-label="Main" style="max-width: 1200px; margin: 0 auto; padding: 0 24px; min-height: 68px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 28px">
+<a href="#top" style="display: flex; align-items: center; gap: 10px; color: #F2F2F5; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.04em">
+<img src="icons/logo-64.png" width="30" height="30" alt="" style="display: block; border-radius: 7px">
+PRISMATICA</a>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 26px; font-size: 15px">
+<a class="navlink" href="#scenes" style="color: #B4B4C3">Scenes</a>
+<a class="navlink" href="#features" style="color: #B4B4C3">Features</a>
+<a class="navlink" href="https://github.com/lunacrescens/prismatica" style="color: #B4B4C3">GitHub</a>
+<a class="btn-primary" href="download.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border-radius: 999px; background: #7DF9E9; color: #06120F; font-weight: 600">Download</a>
+</div>
+</nav>
+</header>
+
+<main id="top">
+<section class="hero" aria-label="Prismatica">
+<img class="hero-poster" src="video/showreel-poster.jpg" alt="" fetchpriority="high">
+<video class="hero-video" autoplay muted loop playsinline preload="auto" poster="video/showreel-poster.jpg" aria-hidden="true" disablepictureinpicture>
+<source src="video/showreel-540p.mp4" type="video/mp4" media="(max-width: 760px)">
+<source src="video/showreel-720p.mp4" type="video/mp4">
+</video>
+<div class="hero-shade"></div>
+<div class="hero-inner" style="max-width: 1200px; margin: 0 auto; padding: 96px 24px 112px; text-align: center">
+<p style="margin: 0 0 18px; font-size: 13px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #7DF9E9">Free · Windows · macOS · Browser</p>
+<h1 style="margin: 0 auto; max-width: 900px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(42px, 6.4vw, 84px); line-height: 1.02; letter-spacing: -0.03em">Your music, melted into light.</h1>
+<p style="margin: 26px auto 0; max-width: 640px; font-size: 19px; color: #B4B4C3">A psychedelic music visualizer in the spirit of the old iTunes and Windows Media Player visualizers, with a lot more going on. Ten scenes that breathe with the bass, flash on the beat and drift on the melody.</p>
+<div style="margin-top: 36px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center">
+<a class="btn-primary" href="download.html" style="display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 28px; border-radius: 999px; background: #7DF9E9; color: #06120F; font-weight: 600; font-size: 17px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+Download for free</a>
+<a class="btn-ghost" href="play/" style="display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 28px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.22); color: #F2F2F5; font-weight: 600; font-size: 17px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"></path></svg>
+Try it in your browser</a>
+</div>
+<p style="margin: 18px 0 0; font-size: 14px; color: #8E8E9E">No install needed for the browser version. Drop in a song or use the built-in demo track.</p>
+</div>
+<button class="hero-pause" type="button" aria-pressed="false" aria-label="Pause background video"><svg class="i-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg><svg class="i-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button>
+</section>
+<section id="scenes" style="max-width: 1200px; margin: 0 auto; padding: 96px 24px 96px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 40px; margin-bottom: 36px">
+<div style="max-width: 620px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(32px, 4vw, 48px); line-height: 1.08; letter-spacing: -0.02em">Ten scenes. Endless variations.</h2>
+<p style="margin: 14px 0 0; font-size: 17px; color: #B4B4C3">Every scene is a set of layers feeding back into each other, so no two moments look the same. Prismatica cross-fades to the next scene on a beat, or lock the one you love.</p>
+</div>
+<p style="margin: 0; font-size: 14px; color: #8E8E9E">Press 1–0 to jump straight to a scene.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px">
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-01-event-horizon.jpg" alt="Event Horizon scene: a glowing ring with a starburst of particles" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">01</span>
+<span style="font-weight: 600; font-size: 15px">Event Horizon</span>
+</figcaption>
+</figure>
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-02-mandala-engine.jpg" alt="Mandala Engine scene: a kaleidoscopic mandala of spectrum bars" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">02</span>
+<span style="font-weight: 600; font-size: 15px">Mandala Engine</span>
+</figcaption>
+</figure>
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-03-liquid-aurora.jpg" alt="Liquid Aurora scene: smeared aurora colours flowing across the screen" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">03</span>
+<span style="font-weight: 600; font-size: 15px">Liquid Aurora</span>
+</figcaption>
+</figure>
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-04-neon-tunnel.jpg" alt="Neon Tunnel scene: neon rings rushing outward like a tunnel" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">04</span>
+<span style="font-weight: 600; font-size: 15px">Neon Tunnel</span>
+</figcaption>
+</figure>
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-05-spectrum-bloom.jpg" alt="Spectrum Bloom scene: a radial spectrum blooming from the centre" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">05</span>
+<span style="font-weight: 600; font-size: 15px">Spectrum Bloom</span>
+</figcaption>
+</figure>
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-06-kaleido-fever.jpg" alt="Kaleido Fever scene: a twelve-way kaleidoscope of plasma and light" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">06</span>
+<span style="font-weight: 600; font-size: 15px">Kaleido Fever</span>
+</figcaption>
+</figure>
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-07-phyllotaxis.jpg" alt="Phyllotaxis scene: a sunflower spiral of dancing points" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">07</span>
+<span style="font-weight: 600; font-size: 15px">Phyllotaxis</span>
+</figcaption>
+</figure>
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-08-ripple-tank.jpg" alt="Ripple Tank scene: soft ripples of colour spreading outward" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">08</span>
+<span style="font-weight: 600; font-size: 15px">Ripple Tank</span>
+</figcaption>
+</figure>
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-09-hyperflower.jpg" alt="Hyperflower scene: a breathing flower of rose curves" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">09</span>
+<span style="font-weight: 600; font-size: 15px">Hyperflower</span>
+</figcaption>
+</figure>
+
+<figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
+<div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-10-meltdown.jpg" alt="Meltdown scene: every layer at once, melting together" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
+<figcaption style="padding: 12px 14px 14px; display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: #8E8E9E">10</span>
+<span style="font-weight: 600; font-size: 15px">Meltdown</span>
+</figcaption>
+</figure>
+
+</div>
+</section>
+
+<section id="features" style="border-top: 1px solid rgba(255,255,255,0.07); border-bottom: 1px solid rgba(255,255,255,0.07); background: #0B0B11">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+<h2 style="margin: 0 0 48px; max-width: 640px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(32px, 4vw, 48px); line-height: 1.08; letter-spacing: -0.02em">Built to sit on your screen for hours.</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px 48px">
+
+<div style="display: flex; gap: 18px">
+<div style="flex: none; width: 46px; height: 46px; border-radius: 12px; background: rgba(125,249,233,0.1); border: 1px solid rgba(125,249,233,0.25); display: flex; align-items: center; justify-content: center; color: #7DF9E9; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px">1</div>
+<div>
+<h3 style="margin: 4px 0 8px; font-size: 18px; font-weight: 600">Listen to anything</h3>
+<p style="margin: 0; color: #B4B4C3">Open your music files, capture whatever your computer is playing, use a microphone or line-in, or start the built-in demo track.</p>
+</div>
+</div>
+
+<div style="display: flex; gap: 18px">
+<div style="flex: none; width: 46px; height: 46px; border-radius: 12px; background: rgba(125,249,233,0.1); border: 1px solid rgba(125,249,233,0.25); display: flex; align-items: center; justify-content: center; color: #7DF9E9; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px">2</div>
+<div>
+<h3 style="margin: 4px 0 8px; font-size: 18px; font-weight: 600">Reacts to every beat</h3>
+<p style="margin: 0; color: #B4B4C3">Bass, mids and highs each drive their own layers, and beat detection fires shockwaves and scene changes in time with the music.</p>
+</div>
+</div>
+
+<div style="display: flex; gap: 18px">
+<div style="flex: none; width: 46px; height: 46px; border-radius: 12px; background: rgba(125,249,233,0.1); border: 1px solid rgba(125,249,233,0.25); display: flex; align-items: center; justify-content: center; color: #7DF9E9; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px">3</div>
+<div>
+<h3 style="margin: 4px 0 8px; font-size: 18px; font-weight: 600">Synced lyrics</h3>
+<p style="margin: 0; color: #B4B4C3">Line-by-line lyrics from .lrc files, embedded tags or LRCLIB, tucked into a corner so they never take over the picture.</p>
+</div>
+</div>
+
+<div style="display: flex; gap: 18px">
+<div style="flex: none; width: 46px; height: 46px; border-radius: 12px; background: rgba(125,249,233,0.1); border: 1px solid rgba(125,249,233,0.25); display: flex; align-items: center; justify-content: center; color: #7DF9E9; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px">4</div>
+<div>
+<h3 style="margin: 4px 0 8px; font-size: 18px; font-weight: 600">Fullscreen, distraction-free</h3>
+<p style="margin: 0; color: #B4B4C3">Double-click for fullscreen. The controls and cursor disappear after a few seconds of stillness.</p>
+</div>
+</div>
+
+<div style="display: flex; gap: 18px">
+<div style="flex: none; width: 46px; height: 46px; border-radius: 12px; background: rgba(125,249,233,0.1); border: 1px solid rgba(125,249,233,0.25); display: flex; align-items: center; justify-content: center; color: #7DF9E9; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px">5</div>
+<div>
+<h3 style="margin: 4px 0 8px; font-size: 18px; font-weight: 600">Keyboard friendly</h3>
+<p style="margin: 0; color: #B4B4C3">Space to play, arrows for scenes, Y for lyrics, F for fullscreen, comma for settings. Press ? for the full list.</p>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 112px 24px 56px; display: flex; flex-wrap: wrap; align-items: center; gap: 48px 64px">
+<div style="flex: 1 1 360px; min-width: 0">
+<p style="margin: 0 0 12px; font-size: 13px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #FF8BDF">Lyrics</p>
+<h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.1; letter-spacing: -0.02em">Sing along without leaving the trip.</h2>
+<p style="margin: 18px 0 0; font-size: 17px; color: #B4B4C3">Synced lyrics sit quietly in the corner and light up line by line. Prismatica finds them in a .lrc file next to your song, in the file's own tags, or online through LRCLIB.</p>
+<ul style="margin: 22px 0 0; padding: 0 0 0 20px; color: #B4B4C3; display: flex; flex-direction: column; gap: 8px">
+<li>Search by hand when a song isn't matched automatically</li>
+<li>Nudge the timing with [ and ], remembered per song</li>
+<li>Toggle with Y, or turn off online lookup entirely</li>
+</ul>
+</div>
+<div style="flex: 1.4 1 480px; min-width: 0; border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1)">
+<img src="images/lyrics2.jpg" alt="Lyrics in the lower-left corner, the current line lit up in white, over the Event Horizon scene" style="display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover">
+</div>
+</section>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 56px 24px 112px; display: flex; flex-wrap: wrap-reverse; align-items: center; gap: 48px 64px">
+<div style="flex: 1.4 1 480px; min-width: 0; border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1)">
+<img src="images/settings.jpg" alt="The settings panel open over the Mandala Engine scene" style="display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover">
+</div>
+<div style="flex: 1 1 360px; min-width: 0">
+<p style="margin: 0 0 12px; font-size: 13px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #7DF9E9">Make it yours</p>
+<h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.1; letter-spacing: -0.02em">Out of the way until you need it.</h2>
+<p style="margin: 18px 0 0; font-size: 17px; color: #B4B4C3">The controls fade out when you stop moving the mouse. A small settings menu picks how often scenes change, whether their names pop up, lyrics, and render quality. Everything is remembered.</p>
+</div>
+</section>
+
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 112px 24px; text-align: center">
+<h2 style="margin: 0 auto; max-width: 760px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(34px, 4.6vw, 58px); line-height: 1.05; letter-spacing: -0.025em">Put something on. Turn the lights off.</h2>
+<p style="margin: 20px auto 0; max-width: 560px; font-size: 18px; color: #B4B4C3">Free for Windows and macOS, or right in your browser.</p>
+<div style="margin-top: 34px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center">
+<a class="btn-primary" href="download.html" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 28px; border-radius: 999px; background: #7DF9E9; color: #06120F; font-weight: 600; font-size: 17px">Download Prismatica</a>
+<a class="btn-ghost" href="play/" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 28px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.22); color: #F2F2F5; font-weight: 600; font-size: 17px">Try it in your browser</a>
+</div>
+</section>
+</main>
+
+<footer style="border-top: 1px solid rgba(255,255,255,0.07)">
+<div style="max-width: 1200px; margin: 0 auto; padding: 32px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; font-size: 14px; color: #8E8E9E">
+<span>Prismatica · made by Noah</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 24px">
+<a href="https://github.com/lunacrescens/prismatica" style="color: #B4B4C3">Source on GitHub</a>
+<a href="https://github.com/lunacrescens/prismatica/releases" style="color: #B4B4C3">All releases</a>
+<a href="https://lrclib.net" style="color: #B4B4C3">Lyrics by LRCLIB</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+(function () {
+  var v = document.querySelector('.hero-video'), b = document.querySelector('.hero-pause');
+  if (!v || !b) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var userPaused = reduce.matches, visible = true;
+  function sync() {
+    var run = !userPaused && visible && !document.hidden;
+    if (run) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } else v.pause();
+    b.setAttribute('aria-pressed', userPaused ? 'true' : 'false');
+    b.setAttribute('aria-label', userPaused ? 'Play background video' : 'Pause background video');
+    v.style.display = userPaused && reduce.matches ? 'none' : '';
+  }
+  b.addEventListener('click', function () { userPaused = !userPaused; if (!userPaused) v.style.display = 'block'; sync(); });
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; sync(); }).observe(v);
+  document.addEventListener('visibilitychange', sync);
+  sync();
+})();
+</script>
+</body>
+</html>

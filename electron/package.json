@@ -1,0 +1,22 @@
+{
+  "name": "prismatica",
+  "productName": "Prismatica",
+  "version": "1.5.0",
+  "description": "A psychedelic music visualizer",
+  "main": "main.js",
+  "author": "lunacrescens",
+  "license": "MIT",
+  "homepage": "https://lunacrescens.github.io/prismatica/",
+  "repository": { "type": "git", "url": "https://github.com/lunacrescens/prismatica.git" },
+  "scripts": {
+    "start": "electron .",
+    "dist": "node scripts/package.js",
+    "dist:win": "node scripts/package.js win32-x64",
+    "dist:mac": "node scripts/package.js darwin-arm64 darwin-x64",
+    "html": "python3 scripts/make-html.py ../website/play/index.html"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "45.3.2"
+  }
+}

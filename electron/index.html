@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; media-src 'self' blob:; style-src 'self' 'unsafe-inline'">
+<title>Prismatica</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<div id="toast"></div>
+
+<div id="lyrics"><div id="lyricsLines"></div></div>
+<div id="lynone" hidden><span id="lynoneText">No timed lyrics found</span> <button id="lynoneBtn">Search lyrics (S)</button></div>
+<div id="lysearch" hidden>
+  <div class="head"><input id="lysq" type="text" spellcheck="false" placeholder="Artist and song title"><button id="lysclose" title="Close (Esc)">&#10005;</button></div>
+  <div id="lysmsg"></div>
+  <div id="lysres"></div>
+</div>
+
+<div id="welcome">
+  <h1>PRISMATICA</h1>
+  <p>Pick something to listen to</p>
+  <div class="choices">
+    <button data-src="files"><b>Open music</b><span>MP3, FLAC, WAV, OGG, M4A — or drop files anywhere</span></button>
+    <button data-src="system"><b>System audio</b><span>Visualize whatever your computer is playing</span></button>
+    <button data-src="mic"><b>Microphone</b><span>React to the room or a line-in</span></button>
+    <button data-src="demo"><b>Demo track</b><span>Built-in generated loop</span></button>
+  </div>
+</div>
+
+<div id="bar">
+  <div class="row">
+    <div class="group">
+      <button data-src="files" title="Open music files (O)">Open</button>
+      <button data-src="system" title="Capture system audio">System</button>
+      <button data-src="mic" title="Microphone">Mic</button>
+      <button data-src="demo" title="Demo track">Demo</button>
+    </div>
+    <div class="group grow" id="transport">
+      <button id="prevT" title="Previous track (P)">&#9198;</button>
+      <button id="play" title="Play / pause (Space)">&#9654;</button>
+      <button id="nextT" title="Next track (N)">&#9197;</button>
+      <span id="title">No audio</span>
+      <input id="seek" type="range" min="0" max="1000" value="0">
+      <span id="time">0:00</span>
+      <input id="vol" type="range" min="0" max="100" value="80" title="Volume">
+    </div>
+    <div class="group">
+      <button id="prevS" title="Previous scene (&larr;)">&#9664;</button>
+      <span id="scene">Scene</span>
+      <button id="nextS" title="Next scene (&rarr;)">&#9654;</button>
+      <button id="lyr" title="Lyrics (Y)">Lyrics</button>
+      <button id="lock" title="Lock scene / auto-cycle (L)">Auto</button>
+      <button id="full" title="Fullscreen (F)">&#9974;</button>
+      <button id="settingsBtn" title="Settings (,)">&#9881;</button>
+      <button id="help" title="Keys (?)">?</button>
+    </div>
+  </div>
+</div>
+
+<div id="settingsPanel" hidden>
+  <h2>Settings</h2>
+  <label class="row"><span>Show scene name when it changes</span><input type="checkbox" id="setSceneNames"></label>
+  <label class="row"><span>Cycle through scenes automatically</span><input type="checkbox" id="setAuto"></label>
+  <label class="row sub"><span>Change scene about every</span>
+    <select id="setCycle"><option value="15">15 seconds</option><option value="30">30 seconds</option><option value="60">1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select></label>
+  <div class="sep"></div>
+  <label class="row"><span>Lyrics</span><input type="checkbox" id="setLyrics"></label>
+  <label class="row sub"><span>Look up lyrics online (lrclib.net)</span><input type="checkbox" id="setOnline"></label>
+  <div class="sep"></div>
+  <label class="row"><span>Render quality</span>
+    <select id="setQuality"><option value="0"></option><option value="1"></option><option value="2"></option></select></label>
+  <p class="hint">Lower quality runs smoother on older graphics.</p>
+</div>
+
+<div id="keys" hidden>
+  <h2>Keys</h2>
+  <table>
+    <tr><td>Space</td><td>Play / pause</td></tr>
+    <tr><td>&larr; &rarr;</td><td>Previous / next scene</td></tr>
+    <tr><td>1 &ndash; 0</td><td>Jump to scene</td></tr>
+    <tr><td>R</td><td>Random scene</td></tr>
+    <tr><td>L</td><td>Lock scene / auto-cycle</td></tr>
+    <tr><td>N / P</td><td>Next / previous track</td></tr>
+    <tr><td>O</td><td>Open music files</td></tr>
+    <tr><td>Y</td><td>Lyrics on / off</td></tr>
+    <tr><td>S</td><td>Search lyrics by hand</td></tr>
+    <tr><td>[ / ]</td><td>Lyrics earlier / later (\ resets)</td></tr>
+    <tr><td>Shift+Y</td><td>Online lyrics lookup on / off</td></tr>
+    <tr><td>F</td><td>Fullscreen</td></tr>
+    <tr><td>Q</td><td>Render quality</td></tr>
+    <tr><td>H</td><td>Hide / show controls</td></tr>
+    <tr><td>,</td><td>Settings</td></tr>
+  </table>
+</div>
+
+<input id="file" type="file" accept="audio/*,video/mp4,.flac,.m4a,.opus,.lrc" multiple hidden>
+<audio id="audio" crossorigin="anonymous"></audio>
+<script src="shaders.js"></script>
+<script src="audio.js"></script>
+<script src="lyrics.js"></script>
+<script src="renderer.js"></script>
+</body>
+</html>

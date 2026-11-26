@@ -1,0 +1,21 @@
+# Electron
+electron/node_modules/
+electron/dist/
+
+# Native (CMake build folders)
+/build/
+/native/build/
+/out/
+.vs/
+*.user
+CMakeUserPresets.json
+
+# Prebuilt downloads waiting to be attached to a GitHub Release (not source)
+release-assets/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

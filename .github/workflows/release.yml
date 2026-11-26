@@ -1,0 +1,131 @@
+# Builds every Prismatica download. Push a tag like v1.0.1 and the files are attached to a new GitHub Release
+# under the exact names the website links to. Run it by hand (Actions > Release > Run workflow) to just build
+# and download the files without releasing.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  electron:
+    name: Electron (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Windows, os: windows-latest, script: 'dist:win' }
+          - { name: macOS,   os: macos-latest,   script: 'dist:mac' }
+    defaults:
+      run:
+        working-directory: electron
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: electron/package-lock.json
+      - run: npm ci
+      - run: npm run ${{ matrix.script }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: electron-${{ matrix.name }}
+          path: electron/dist/*.zip
+          if-no-files-found: error
+
+  native-windows:
+    name: Native (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          cmake -S native -B build -A x64
+          cmake --build build --config Release --parallel
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force out/Prismatica, out/saver | Out-Null
+          Copy-Item build/Release/Prismatica.exe out/Prismatica/
+          Copy-Item native/res/README-dist.txt out/Prismatica/README.txt
+          Compress-Archive -Path out/Prismatica -DestinationPath out/Prismatica-Native-Windows-x64.zip
+          Copy-Item "build/Release/Prismatica Ripple Tank.scr" out/saver/
+          Copy-Item native/res/README-saver-windows.txt out/saver/README.txt
+          Compress-Archive -Path out/saver/* -DestinationPath out/Prismatica-RippleTank-Screensaver-Windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-Windows
+          path: out/*.zip
+          if-no-files-found: error
+
+  native-macos:
+    name: Native (macOS universal)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (Intel + Apple Silicon)
+        run: |
+          cmake -S native -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          cmake --build build --parallel
+      - name: Sign (ad-hoc) and package
+        run: |
+          mkdir -p out/app out/saver
+          cp -R build/Prismatica.app out/app/
+          cp -R "build/Prismatica Ripple Tank.saver" "build/Prismatica Ripple Tank HD.saver" out/saver/
+          for b in out/app/Prismatica.app out/saver/*.saver; do codesign --force --deep --sign - "$b"; done
+          lipo -info out/app/Prismatica.app/Contents/MacOS/Prismatica
+          cp native/res/README-dist.txt out/app/README.txt
+          cp native/res/README-saver-mac.txt out/saver/README.txt
+          (cd out/app && zip -qry9 ../Prismatica-Native-Mac-Universal.zip Prismatica.app README.txt)
+          (cd out/saver && zip -qry9 ../Prismatica-RippleTank-Screensaver-Mac.zip *.saver README.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-macOS
+          path: out/*.zip
+          if-no-files-found: error
+
+  browser:
+    name: Browser version (single HTML file)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 electron/scripts/make-html.py out/Prismatica.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: browser
+          path: out/Prismatica.html
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [electron, native-windows, native-macos, browser]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: files
+          merge-multiple: true
+      - run: ls -la files
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: files/*
+          generate_release_notes: true
+          body: |
+            **Not sure which to get?** Take the **Electron** build for your system: it has every feature (lyrics, settings menu).
+            The **Native** build is tiny and runs on older Macs whose graphics Chromium no longer supports.
+            Or skip the download: [run it in your browser](https://lunacrescens.github.io/prismatica/play/).
+
+            | | Windows | macOS |
+            |---|---|---|
+            | Electron (recommended) | `Prismatica-Electron-Windows-x64.zip` | `Prismatica-Electron-Mac-AppleSilicon-arm64.zip` / `Prismatica-Electron-Mac-Intel-x64.zip` |
+            | Native | `Prismatica-Native-Windows-x64.zip` | `Prismatica-Native-Mac-Universal.zip` |
+            | Ripple Tank screensaver | `Prismatica-RippleTank-Screensaver-Windows.zip` | `Prismatica-RippleTank-Screensaver-Mac.zip` |
+
+            The apps aren't signed with a paid certificate. Windows: More info → Run anyway. macOS: System Settings → Privacy & Security → Open Anyway.
