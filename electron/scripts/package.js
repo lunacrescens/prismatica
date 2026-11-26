@@ -4,6 +4,12 @@
 //   node scripts/package.js darwin-arm64 darwin-x64
 // macOS apps are ad-hoc signed when built on a Mac (needed to launch on Apple Silicon). Zipping uses the
 // system's zip tool (tar on Windows 10+).
+//
+// The Ripple Tank screensaver (built from native/) ships inside each zip, in a "Screensaver" folder.
+// Point SCREENSAVER_DIR at a folder holding it:
+//   Windows zip: "Prismatica Ripple Tank.scr"
+//   macOS zips:  "Prismatica Ripple Tank.saver" and "Prismatica Ripple Tank HD.saver"
+// Without SCREENSAVER_DIR the zips are built without it (fine for testing, not for a release).
 const { packager } = require('@electron/packager');
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -17,6 +23,23 @@ const ZIP_NAMES = {
   'darwin-x64': 'Prismatica-Electron-Mac-Intel-x64.zip',
 };
 const targets = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(ZIP_NAMES);
+const SAVER_DIR = process.env.SCREENSAVER_DIR ? path.resolve(process.env.SCREENSAVER_DIR) : null;
+const SAVER_FILES = { win32: ['Prismatica Ripple Tank.scr'], darwin: ['Prismatica Ripple Tank.saver', 'Prismatica Ripple Tank HD.saver'] };
+const SAVER_README = { win32: 'README-saver-windows.txt', darwin: 'README-saver-mac.txt' };
+
+// Copy the screensaver into <dest>/Screensaver; returns false when SCREENSAVER_DIR isn't set.
+function addScreensaver(platform, dest) {
+  if (!SAVER_DIR) { console.warn('  SCREENSAVER_DIR not set: building without the Ripple Tank screensaver'); return false; }
+  const into = path.join(dest, 'Screensaver');
+  fs.mkdirSync(into, { recursive: true });
+  for (const f of SAVER_FILES[platform]) {
+    const from = path.join(SAVER_DIR, f);
+    if (!fs.existsSync(from)) throw new Error(`screensaver file missing: ${from}`);
+    fs.cpSync(from, path.join(into, f), { recursive: true, verbatimSymlinks: true });
+  }
+  fs.copyFileSync(path.join(root, '..', 'native', 'res', SAVER_README[platform]), path.join(into, 'README.txt'));
+  return true;
+}
 
 function zip(cwd, zipPath, items) {
   fs.rmSync(zipPath, { force: true });
@@ -32,7 +55,7 @@ function zip(cwd, zipPath, items) {
       dir: root, out, overwrite: true, asar: true, prune: false,   // no runtime dependencies: leave node_modules out entirely
       name: 'Prismatica', platform, arch,
       icon: path.join(root, 'build', platform === 'win32' ? 'icon.ico' : 'icon.icns'),
-      ignore: [/^\/dist($|\/)/, /^\/scripts($|\/)/, /^\/build($|\/)/, /^\/node_modules($|\/)/, /^\/package-lock\.json$/, /^\/\.[^/]+/],
+      ignore: [/^\/dist($|\/)/, /^\/scripts($|\/)/, /^\/build($|\/)/, /^\/node_modules($|\/)/, /^\/saver($|\/)/, /^\/saver-macos\.tgz$/, /^\/package-lock\.json$/, /^\/\.[^/]+/],
       appBundleId: 'com.lunacrescens.prismatica', appCategoryType: 'public.app-category.music',
       appCopyright: 'Copyright (c) 2026 lunacrescens',
       win32metadata: { CompanyName: 'lunacrescens', FileDescription: 'Prismatica music visualizer', ProductName: 'Prismatica' },
@@ -46,12 +69,15 @@ function zip(cwd, zipPath, items) {
     if (platform === 'darwin') {
       if (process.platform === 'darwin') execFileSync('codesign', ['--force', '--deep', '--sign', '-', path.join(dir, 'Prismatica.app')], { stdio: 'inherit' });
       else console.warn('  (not on a Mac: the app is unsigned and Apple Silicon Macs will refuse to open it)');
-      zip(dir, zipPath, ['Prismatica.app', 'README.txt']);
+      const items = ['Prismatica.app', 'README.txt'];
+      if (addScreensaver('darwin', dir)) items.push('Screensaver');
+      zip(dir, zipPath, items);
     } else {
       // Windows zip holds a "Prismatica" folder
       const staged = path.join(out, 'Prismatica');
       fs.rmSync(staged, { recursive: true, force: true });
       fs.cpSync(dir, staged, { recursive: true });
+      addScreensaver('win32', staged);
       zip(out, zipPath, ['Prismatica']);
       fs.rmSync(staged, { recursive: true, force: true });
     }

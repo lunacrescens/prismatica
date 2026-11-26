@@ -1,4 +1,4 @@
-PRISMATICA SCREENSAVERS (Windows)
+PRISMATICA RIPPLE TANK SCREENSAVER (Windows) - comes with Prismatica
 A calm, slow version of the Ripple Tank scene. No music, no sound, no settings.
 
 INSTALL   Right-click the .scr file -> Install. Windows opens Screen Saver Settings with it selected;

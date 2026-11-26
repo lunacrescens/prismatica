@@ -6,6 +6,9 @@ GPU FALLBACK  If WebGL can't start on your graphics card (e.g. OCLP-patched Macs
               restarts itself in software rendering and remembers that. It works, but at a lower
               resolution and frame rate. To try the GPU again, launch it once with --force-gpu.
 
+SCREENSAVER  The Screensaver folder holds the Ripple Tank screensaver, a calm, silent version of
+             one scene. Its README.txt explains how to install it.
+
 WINDOWS  Unzip the whole folder, run Prismatica.exe (keep it next to the other files).
          SmartScreen may warn because the app is unsigned: More info -> Run anyway.
 
