@@ -126,6 +126,6 @@ jobs:
             |---|---|---|
             | Electron (recommended) | `Prismatica-Electron-Windows-x64.zip` | `Prismatica-Electron-Mac-AppleSilicon-arm64.zip` / `Prismatica-Electron-Mac-Intel-x64.zip` |
             | Native | `Prismatica-Native-Windows-x64.zip` | `Prismatica-Native-Mac-Universal.zip` |
-            | Ripple Tank screensaver | `Prismatica-RippleTank-Screensaver-Windows.zip` | `Prismatica-RippleTank-Screensaver-Mac.zip` |
+            | Extra: Ripple Tank screensaver | `Prismatica-RippleTank-Screensaver-Windows.zip` | `Prismatica-RippleTank-Screensaver-Mac.zip` |
 
             The apps aren't signed with a paid certificate. Windows: More info → Run anyway. macOS: System Settings → Privacy & Security → Open Anyway.
