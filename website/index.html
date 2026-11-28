@@ -41,20 +41,28 @@ a{color:#7DF9E9;text-decoration:none}a:hover{color:#B8FFF6}
 .hero-pause .i-play{display:none}.hero-pause[aria-pressed="true"] .i-play{display:block}.hero-pause[aria-pressed="true"] .i-pause{display:none}
 .hero .btn-ghost{background:rgba(7,7,11,.45);backdrop-filter:blur(6px)}
 @media (prefers-reduced-motion: reduce){.hero-video{display:none}}
+@media (max-width: 720px){
+  .nav{padding:0 16px !important;min-height:60px !important;flex-wrap:nowrap !important}
+  .nav-links{flex-wrap:nowrap !important;gap:18px !important}
+  .nav-brand{font-size:18px !important;gap:8px !important}
+  .nav-brand img{width:26px !important;height:26px !important}
+  .nav .btn-primary{min-height:40px !important;padding:0 18px !important}
+  .hide-sm{display:none !important}
+}
 </style>
 </head>
 <body>
 <div style="min-height: 100vh; background: #07070B; color: #F2F2F5; font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 1.6">
 
 <header style="position: sticky; top: 0; z-index: 10; background: rgba(7,7,11,0.82); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.07)">
-<nav aria-label="Main" style="max-width: 1200px; margin: 0 auto; padding: 0 24px; min-height: 68px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 28px">
-<a href="#top" style="display: flex; align-items: center; gap: 10px; color: #F2F2F5; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.04em">
+<nav class="nav" aria-label="Main" style="max-width: 1200px; margin: 0 auto; padding: 0 24px; min-height: 68px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 28px">
+<a href="#top" class="nav-brand" style="display: flex; align-items: center; gap: 10px; color: #F2F2F5; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.04em">
 <img src="icons/logo-64.png" width="30" height="30" alt="" style="display: block; border-radius: 7px">
 PRISMATICA</a>
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 26px; font-size: 15px">
-<a class="navlink" href="#scenes" style="color: #B4B4C3">Scenes</a>
-<a class="navlink" href="#features" style="color: #B4B4C3">Features</a>
-<a class="navlink" href="https://github.com/lunacrescens/prismatica" style="color: #B4B4C3">GitHub</a>
+<div class="nav-links" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 26px; font-size: 15px">
+<a class="navlink hide-sm" href="#scenes" style="color: #B4B4C3">Scenes</a>
+<a class="navlink hide-sm" href="#features" style="color: #B4B4C3">Features</a>
+<a class="navlink hide-sm" href="https://github.com/lunacrescens/prismatica" style="color: #B4B4C3">GitHub</a>
 <a class="btn-primary" href="download.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border-radius: 999px; background: #7DF9E9; color: #06120F; font-weight: 600">Download</a>
 </div>
 </nav>
@@ -92,7 +100,7 @@ Try it in your browser</a>
 </div>
 <p style="margin: 0; font-size: 14px; color: #8E8E9E">Press 1–0 to jump straight to a scene.</p>
 </div>
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px">
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); gap: 18px">
 
 <figure class="scene-card" style="margin: 0; border-radius: 14px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.07)">
 <div style="overflow: hidden; aspect-ratio: 16 / 9"><img src="images/t-01-event-horizon.jpg" alt="Event Horizon scene: a glowing ring with a starburst of particles" style="display: block; width: 100%; height: 100%; object-fit: cover"></div>
@@ -180,7 +188,7 @@ Try it in your browser</a>
 <section id="features" style="border-top: 1px solid rgba(255,255,255,0.07); border-bottom: 1px solid rgba(255,255,255,0.07); background: #0B0B11">
 <div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
 <h2 style="margin: 0 0 48px; max-width: 640px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(32px, 4vw, 48px); line-height: 1.08; letter-spacing: -0.02em">Built to sit on your screen for hours.</h2>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px 48px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 40px 48px">
 
 <div style="display: flex; gap: 18px">
 <div style="flex: none; width: 46px; height: 46px; border-radius: 12px; background: rgba(125,249,233,0.1); border: 1px solid rgba(125,249,233,0.25); display: flex; align-items: center; justify-content: center; color: #7DF9E9; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px">1</div>

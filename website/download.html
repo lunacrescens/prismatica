@@ -32,19 +32,27 @@ a{color:#7DF9E9;text-decoration:none}a:hover{color:#B8FFF6}
 .os-tab[aria-selected="true"]{background:#F2F2F5;color:#07070B}
 .os-tab[aria-selected="true"]:hover{background:#FFFFFF}
 .os-tab:focus-visible{outline:2px solid #7DF9E9;outline-offset:2px}
+@media (max-width: 720px){
+  .nav{padding:0 16px !important;min-height:60px !important;flex-wrap:nowrap !important}
+  .nav-links{flex-wrap:nowrap !important;gap:18px !important}
+  .nav-brand{font-size:18px !important;gap:8px !important}
+  .nav-brand img{width:26px !important;height:26px !important}
+  .nav .btn-primary{min-height:40px !important;padding:0 18px !important}
+  .hide-sm{display:none !important}
+}
 </style>
 </head>
 <body>
 <div style="min-height: 100vh; background: #07070B; color: #F2F2F5; font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 1.6">
 
 <header style="position: sticky; top: 0; z-index: 10; background: rgba(7,7,11,0.82); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.07)">
-<nav aria-label="Main" style="max-width: 1200px; margin: 0 auto; padding: 0 24px; min-height: 68px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 28px">
-<a href="./" style="display: flex; align-items: center; gap: 10px; color: #F2F2F5; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.04em">
+<nav class="nav" aria-label="Main" style="max-width: 1200px; margin: 0 auto; padding: 0 24px; min-height: 68px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 28px">
+<a href="./" class="nav-brand" style="display: flex; align-items: center; gap: 10px; color: #F2F2F5; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.04em">
 <img src="icons/logo-64.png" width="30" height="30" alt="" style="display: block; border-radius: 7px">
 PRISMATICA</a>
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 26px; font-size: 15px">
-<a class="navlink" href="./#scenes" style="color: #B4B4C3">Scenes</a>
-<a class="navlink" href="./#features" style="color: #B4B4C3">Features</a>
+<div class="nav-links" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 26px; font-size: 15px">
+<a class="navlink hide-sm" href="./#scenes" style="color: #B4B4C3">Scenes</a>
+<a class="navlink hide-sm" href="./#features" style="color: #B4B4C3">Features</a>
 <a class="navlink" href="https://github.com/lunacrescens/prismatica" style="color: #B4B4C3">GitHub</a>
 </div>
 </nav>
@@ -60,7 +68,7 @@ PRISMATICA</a>
 <button class="os-tab" role="tab" id="tab-linux" aria-controls="panel-linux" aria-selected="false" data-os="linux" tabindex="-1">Linux</button>
 </div>
 <div role="tabpanel" id="panel-windows" aria-labelledby="tab-windows">
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 20px">
 
 <article style="display: flex; flex-direction: column; padding: 28px; border-radius: 20px; background: #111118; border: 1px solid rgba(125,249,233,0.45);">
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px">
@@ -126,7 +134,7 @@ PRISMATICA</a>
 </div>
 </div>
 <div role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" hidden>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 20px">
 
 <article style="display: flex; flex-direction: column; padding: 28px; border-radius: 20px; background: #111118; border: 1px solid rgba(125,249,233,0.45);">
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px">
@@ -197,7 +205,7 @@ PRISMATICA</a>
 </div>
 </div>
 <div role="tabpanel" id="panel-linux" aria-labelledby="tab-linux" hidden>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 20px">
 
 <article style="display: flex; flex-direction: column; padding: 28px; border-radius: 20px; background: #111118; border: 1px solid rgba(125,249,233,0.45);">
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px">
