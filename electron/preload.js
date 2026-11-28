@@ -9,4 +9,6 @@ contextBridge.exposeInMainWorld('prismatica', {
   searchLyrics: (text, duration) => ipcRenderer.invoke('lyrics:search', text, duration),
   lyricsById: (id) => ipcRenderer.invoke('lyrics:byId', id),
   lyricsLogPath: () => ipcRenderer.invoke('lyrics:logPath'),
+  // drop the remembered software-rendering fallback and restart on the graphics card
+  tryGPU: () => ipcRenderer.invoke('graphics:tryGPU'),
 });

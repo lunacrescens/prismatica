@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session, desktopCapturer, Menu, ipcMain, net } = require('electron');
+const { app, BrowserWindow, session, desktopCapturer, Menu, ipcMain, net, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -26,7 +26,20 @@ function fallBackToSoftware(reason) {
   app.relaunch({ args: process.argv.slice(1).filter((a) => a !== '--force-gpu').concat(['--software-rendering']) });
   app.exit(0);
 }
-app.on('child-process-gone', (e, d) => { if (d.type === 'GPU' && d.reason !== 'clean-exit') fallBackToSoftware('gpu-process-' + d.reason); });
+// Chromium restarts a crashed GPU process by itself, so one crash isn't a reason to give up on the GPU for good:
+// fall back only when it crashes again within two minutes (or while the app is still starting).
+const startedAt = Date.now(); let gpuCrashes = [];
+app.on('child-process-gone', (e, d) => {
+  if (d.type !== 'GPU' || d.reason === 'clean-exit') return;
+  const now = Date.now(); gpuCrashes = gpuCrashes.filter((t) => now - t < 120000).concat(now);
+  if (gpuCrashes.length >= 2 || now - startedAt < 15000) fallBackToSoftware('gpu-process-' + d.reason);
+});
+// Settings > "Try the graphics card again": forget the software-rendering choice and restart on the GPU.
+ipcMain.handle('graphics:tryGPU', () => {
+  try { fs.unlinkSync(SOFT_MARKER); } catch (e) {}
+  app.relaunch({ args: process.argv.slice(1).filter((a) => a !== '--software-rendering') });
+  app.exit(0);
+});
 if (SHOT_DIR) {
   app.commandLine.appendSwitch('use-angle', 'swiftshader');
   app.commandLine.appendSwitch('enable-unsafe-swiftshader');
@@ -51,6 +64,9 @@ function createWindow() {
   // the page sets #nogl when it can't get a working WebGL2 context
   win.webContents.on('did-navigate-in-page', (e, url) => { if (url.endsWith('#nogl')) fallBackToSoftware('no-webgl2'); });
   win.webContents.on('render-process-gone', (e, d) => { if (d.reason !== 'clean-exit') fallBackToSoftware('renderer-' + d.reason); });
+  // never navigate the app window away from the app; web links open in the browser
+  win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('file:')) { e.preventDefault(); if (/^https?:/.test(url)) shell.openExternal(url); } });
+  win.webContents.setWindowOpenHandler(({ url }) => { if (/^https?:/.test(url)) shell.openExternal(url); return { action: 'deny' }; });
   if (SHOT_DIR) runShots(win).catch((e) => { console.error(e); app.exit(1); });
 }
 
@@ -78,9 +94,10 @@ app.whenReady().then(() => {
   session.defaultSession.setPermissionRequestHandler((wc, perm, cb) => cb(['media', 'fullscreen', 'display-capture'].includes(perm)));
   session.defaultSession.setPermissionCheckHandler(() => true);
   session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
-    desktopCapturer.getSources({ types: ['screen'] }).then((sources) => {
-      callback({ video: sources[0], audio: 'loopback' });
-    }).catch(() => callback({}));
+    // only the audio is used; the screen is required by the API but its video track is stopped right away
+    desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 0, height: 0 } }).then((sources) => {
+      if (sources.length) callback({ video: sources[0], audio: 'loopback' }); else callback(null);
+    }).catch(() => callback(null));
   });
 
   if (process.platform === 'darwin') {

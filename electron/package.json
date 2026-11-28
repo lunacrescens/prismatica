@@ -1,7 +1,7 @@
 {
   "name": "prismatica",
   "productName": "Prismatica",
-  "version": "1.5.0",
+  "version": "1.0.1",
   "description": "A psychedelic music visualizer",
   "main": "main.js",
   "author": "lunacrescens",

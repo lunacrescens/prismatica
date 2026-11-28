@@ -73,6 +73,11 @@
   <label class="row"><span>Render quality</span>
     <select id="setQuality"><option value="0"></option><option value="1"></option><option value="2"></option></select></label>
   <p class="hint">Lower quality runs smoother on older graphics.</p>
+  <div id="softRow" hidden>
+    <div class="sep"></div>
+    <p class="hint">Software rendering is on because the graphics card couldn't run Prismatica earlier.</p>
+    <button id="tryGPU">Try the graphics card again</button>
+  </div>
 </div>
 
 <div id="keys" hidden>

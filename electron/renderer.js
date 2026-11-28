@@ -6,12 +6,18 @@
   const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, powerPreference: 'high-performance' });
   const noGL = (why) => {
     if (!SOFT && !SHOT) location.hash = 'nogl';   // main process relaunches with software rendering
-    document.body.innerHTML = '<p style="padding:40px">' + (SOFT ? 'WebGL2 is not available on this machine, even in software mode (' + why + '). Try the native Prismatica build instead.' : 'Graphics unavailable, switching to software rendering...') + '</p>';
+    document.body.innerHTML = '<p style="padding:40px">' + (SOFT ? 'WebGL2 is not available on this machine, even in software mode (' + why + ').' : 'Graphics unavailable, switching to software rendering...') + '</p>';
   };
   if (!gl) { noGL('no context'); return; }
-  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); noGL('context lost'); });
-  const floatOK = !!gl.getExtension('EXT_color_buffer_float') || !!gl.getExtension('EXT_color_buffer_half_float');
-  gl.getExtension('OES_texture_float_linear');
+  // A lost context (GPU driver reset, waking from sleep) normally comes back by itself: rebuild everything then.
+  // Only if it stays gone do we give up on the GPU.
+  let lostTimer = null;
+  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); clearTimeout(lostTimer); lostTimer = setTimeout(() => noGL('context lost'), 8000); });
+  canvas.addEventListener('webglcontextrestored', () => {
+    clearTimeout(lostTimer);
+    try { initGL(); } catch (e) { console.error(e); noGL('could not rebuild after a context loss'); }
+  });
+  let floatOK = false;
 
   // ---------- GL helpers ----------
   function program(vs, fs) {
@@ -27,19 +33,22 @@
     for (let i = 0; i < n; i++) { const info = gl.getActiveUniform(p, i); u[info.name] = gl.getUniformLocation(p, info.name); }
     return { p, u };
   }
-  let progF, progP, progC;
-  try { progF = program(SH.vert, SH.feedback); progP = program(SH.pvert, SH.pfrag); progC = program(SH.vert, SH.composite); }
-  catch (e) { console.error(e); noGL('shader compile failed'); return; }
-  const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+  let progF, progP, progC, audioTex, W = 0, H = 0, quality = SOFT ? 0 : 1, targets = [];
+  function initGL() {                    // every GL object; run again after a lost context comes back
+    floatOK = !!gl.getExtension('EXT_color_buffer_float') || !!gl.getExtension('EXT_color_buffer_half_float');
+    gl.getExtension('OES_texture_float_linear');
+    progF = program(SH.vert, SH.feedback); progP = program(SH.pvert, SH.pfrag); progC = program(SH.vert, SH.composite);
+    gl.bindVertexArray(gl.createVertexArray());
+    audioTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, audioTex);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, Audio.TEXW, 2, 0, gl.RED, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    W = H = 0; targets = [];             // resize() makes fresh render targets on the next frame
+  }
+  try { initGL(); } catch (e) { console.error(e); noGL('shader compile failed'); return; }
 
-  const audioTex = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, audioTex);
-  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, Audio.TEXW, 2, 0, gl.RED, gl.UNSIGNED_BYTE, null);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-  let W = 0, H = 0, quality = SOFT ? 0 : 1, targets = [];
   function makeTarget() {
     const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
     if (floatOK) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, W, H, 0, gl.RGBA, gl.HALF_FLOAT, null);
@@ -101,6 +110,7 @@
     gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, audioTex); if (u.uAudio) gl.uniform1i(u.uAudio, 1);
   }
   function frame(dt, offline) {
+    if (gl.isContextLost()) return;
     resize(); time += dt;
     const L = Audio.update(dt, time, offline);
     stepScene(dt, L);
@@ -136,10 +146,20 @@
     if (!playlist.length) return;
     track = ((i % playlist.length) + playlist.length) % playlist.length;
     if (Audio.mode !== 'files') Audio.useElement();
-    el.src = playlist[track].url; el.play().catch((e) => toast('Cannot play this file'));
+    el.src = playlist[track].url; el.play().catch(() => {});                            // failures are handled by the 'error' event
     $('title').textContent = playlist[track].name; markSource();
     loadLyrics();
   }
+  let badRun = 0;                                                                      // unplayable files in a row
+  el.addEventListener('playing', () => { badRun = 0; });
+  el.addEventListener('error', () => {
+    if (Audio.mode !== 'files' || !playlist[track] || !el.getAttribute('src')) return;
+    Lyrics.clear(); $('lynone').hidden = true;
+    badRun++;
+    if (badRun >= playlist.length) { toast(playlist.length > 1 ? "None of these files can be played" : "Can't play " + playlist[track].name); badRun = 0; return; }
+    toast("Can't play " + playlist[track].name + ', skipping');
+    playTrack(track + 1);
+  });
   // ---------- lyrics ----------
   const duration = () => new Promise((res) => { if (el.duration > 0 && isFinite(el.duration)) return res(el.duration); const done = () => res(isFinite(el.duration) ? el.duration : 0); el.addEventListener('loadedmetadata', done, { once: true }); setTimeout(done, 4000); });
   function loadLyrics() { $('lynone').hidden = true; if (track >= 0 && playlist[track]) Lyrics.load(playlist[track], duration); }
@@ -198,7 +218,9 @@
       playlist[track].lrc = lrcs.get(stem(playlist[track].file.name)) || [...lrcs.values()][0]; if (!Lyrics.enabled) setLyrics(true); return loadLyrics();
     }
     if (!list.length) return toast('No playable audio files');
-    list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    list.sort((a, b) => (a.relPath || a.name).localeCompare(b.relPath || b.name, undefined, { numeric: true }));
+    for (const it of playlist) URL.revokeObjectURL(it.url);
+    badRun = 0;
     playlist = list.map((f) => ({ name: f.name.replace(/\.[^.]+$/, ''), url: URL.createObjectURL(f), file: f, lrc: lrcs.get(stem(f.name)) }));
     playTrack(0);
   }
@@ -258,7 +280,9 @@
     if (e.target.id === 'lysq') return;
     if (e.target.tagName === 'SELECT') return;
     if (e.target.tagName === 'INPUT' && e.key !== ' ' && e.target.type !== 'checkbox') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;                                  // leave Cmd+Q, Ctrl+H etc. to the system
     const k = e.key.toLowerCase();
+    if (k === 's' || k === ',' || k === 'o') e.preventDefault();                       // these move focus; don't type the key into it
     if (k === ' ') { e.preventDefault(); playPause(); }
     else if (k === 'arrowright') setScene(sceneIdx + 1); else if (k === 'arrowleft') setScene(sceneIdx - 1);
     else if (k >= '0' && k <= '9') setScene(k === '0' ? 9 : +k - 1);
@@ -274,14 +298,34 @@
     else if (k === ',') toggleSettings();
     else if (k === 'escape') { $('keys').hidden = true; closeSearch(); toggleSettings(false); }
   });
+  // keep --bar equal to the control bar's real height (it wraps to two rows in narrow windows)
+  const barH = () => document.documentElement.style.setProperty('--bar', $('bar').offsetHeight + 'px');
+  if (window.ResizeObserver) new ResizeObserver(barH).observe($('bar')); barH();
   let idleTimer; function wake() { document.body.classList.remove('idle'); clearTimeout(idleTimer); idleTimer = setTimeout(() => { if (!$('bar').matches(':hover') && $('welcome').hidden) document.body.classList.add('idle'); }, 3000); }
   window.addEventListener('mousemove', wake); window.addEventListener('mousedown', wake); wake();
-  window.addEventListener('dragover', (e) => { e.preventDefault(); document.body.classList.add('drag'); });
-  window.addEventListener('dragleave', () => document.body.classList.remove('drag'));
-  window.addEventListener('drop', (e) => { e.preventDefault(); document.body.classList.remove('drag'); addFiles(e.dataTransfer.files); });
+  let dragDepth = 0;
+  window.addEventListener('dragenter', (e) => { e.preventDefault(); dragDepth++; document.body.classList.add('drag'); });
+  window.addEventListener('dragover', (e) => { e.preventDefault(); });
+  window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('drag'); } });
+  window.addEventListener('drop', (e) => { e.preventDefault(); dragDepth = 0; document.body.classList.remove('drag'); droppedFiles(e.dataTransfer).then(addFiles); });
+  // Dropped folders arrive as one empty "file"; read them through the entries API instead (up to 2000 files).
+  async function droppedFiles(dt) {
+    const entries = [...(dt.items || [])].map((it) => it.webkitGetAsEntry && it.webkitGetAsEntry()).filter(Boolean);
+    if (!entries.some((en) => en.isDirectory)) return [...dt.files];
+    const out = [];
+    const walk = async (en) => {
+      if (out.length >= 2000) return;
+      if (en.isFile) { try { const f = await new Promise((res, rej) => en.file(res, rej)); f.relPath = en.fullPath; out.push(f); } catch (e) {} return; }
+      const rd = en.createReader();
+      for (;;) { const batch = await new Promise((res) => rd.readEntries(res, () => res([]))); if (!batch.length) break; for (const c of batch) await walk(c); }
+    };
+    for (const en of entries) await walk(en);
+    return out;
+  }
 
   setScene(0, true);
   if (SOFT) setTimeout(() => toast('Software rendering (GPU unsupported)'), 600);
+  if (SOFT && window.prismatica && window.prismatica.tryGPU) { $('softRow').hidden = false; $('tryGPU').onclick = () => window.prismatica.tryGPU(); }
 
   // ---------- main loop / screenshot mode ----------
   if (!SHOT) {

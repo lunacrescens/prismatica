@@ -3,7 +3,8 @@ PRISMATICA - psychedelic music visualizer
 
 GPU FALLBACK  If WebGL can't start on your graphics card (e.g. OCLP-patched Macs), Prismatica
               restarts itself in software rendering and remembers that. It works, but at a lower
-              resolution and frame rate. To try the GPU again, launch it once with --force-gpu.
+              resolution and frame rate. To try the GPU again: Settings (,) > "Try the graphics
+              card again", or launch it once with --force-gpu.
 
 SCREENSAVER  The Screensaver folder holds the Ripple Tank screensaver, a calm, silent version of
              one scene. Its README.txt explains how to install it. (Windows and Mac only.)
