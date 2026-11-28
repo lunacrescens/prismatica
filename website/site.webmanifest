@@ -1,7 +1,7 @@
 {
   "name": "Prismatica",
   "short_name": "Prismatica",
-  "description": "Prismatica is a free psychedelic music visualizer for Windows, macOS and the browser, in the spirit of the old iTunes and Windows Media Player visualizers.",
+  "description": "Prismatica is a free psychedelic music visualizer for Windows, macOS, Linux and the browser, in the spirit of the old iTunes and Windows Media Player visualizers.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07070B",

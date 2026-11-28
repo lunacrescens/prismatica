@@ -15,6 +15,7 @@
 
 @implementation SAVER_CLASS {
   NSOpenGLView* _gl;
+  saver::Renderer* _r;      // this view's own GL state (every display gets its own view and GL context)
   CFTimeInterval _last;
   BOOL _preview, _failed;
 }
@@ -62,6 +63,7 @@
 
 - (void)dealloc {
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
+  delete _r;                // its GL objects go away with the view's context
 }
 
 - (void)startAnimation {
@@ -85,7 +87,8 @@
   NSSize px = [_gl convertSizeToBacking:_gl.bounds.size];
   GLint fbo = 0;
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);     // the view's own target (non-zero when layer-backed)
-  saver::render(dt, (int)px.width, (int)px.height, (GLuint)fbo);
+  if (!_r) _r = new saver::Renderer();
+  _r->render(dt, (int)px.width, (int)px.height, (GLuint)fbo);
   [ctx flushBuffer];
 }
 

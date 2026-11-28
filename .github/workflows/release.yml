@@ -77,6 +77,10 @@ jobs:
           name: saver-windows
           path: electron/saver
       - run: npm ci
+      - name: Use the tag as the app version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: npm version --no-git-tag-version --allow-same-version "${GITHUB_REF_NAME#v}"
       - run: npm run dist:win
         env:
           SCREENSAVER_DIR: saver
@@ -106,6 +110,10 @@ jobs:
           path: electron
       - run: mkdir -p saver && tar -xzf saver-macos.tgz -C saver && ls saver
       - run: npm ci
+      - name: Use the tag as the app version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: npm version --no-git-tag-version --allow-same-version "${GITHUB_REF_NAME#v}"
       - run: npm run dist:mac
         env:
           SCREENSAVER_DIR: saver
@@ -129,6 +137,10 @@ jobs:
           cache: npm
           cache-dependency-path: electron/package-lock.json
       - run: npm ci
+      - name: Use the tag as the app version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: npm version --no-git-tag-version --allow-same-version "${GITHUB_REF_NAME#v}"
       - run: npm run dist:linux
       - uses: actions/upload-artifact@v4
         with:

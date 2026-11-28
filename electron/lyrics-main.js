@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const API = process.env.PRISMATICA_LRCLIB_URL || 'https://lrclib.net/api';
-const UA = 'Prismatica/1.3 (desktop music visualizer)';
+let UA = 'Prismatica (desktop music visualizer)';
 let logFile = null;
 function log(...a) { if (!logFile) return; try { fs.appendFileSync(logFile, new Date().toISOString() + ' ' + a.join(' ') + '\n'); } catch (e) {} }
 
@@ -111,8 +111,10 @@ async function lookup(fetchFn, q, cacheDir) {
   if (q.cleanArtist && firstArtist(q.cleanArtist) !== q.cleanArtist) steps.push(() => `${API}/search?${P({ track_name: q.cleanTitle, artist_name: firstArtist(q.cleanArtist) })}`);
   steps.push(() => `${API}/search?${P({ q: [q.cleanArtist, q.cleanTitle].filter(Boolean).join(' ') })}`);
   steps.push(() => `${API}/search?${P({ track_name: q.cleanTitle })}`);
+  const tried = new Set();
   for (const step of steps) {
-    try { consider(await getJSON(fetchFn, step())); anyOk = true; } catch (e) { lastErr = e; log('error', String(e && e.message || e)); }
+    const url = step(); if (tried.has(url)) continue; tried.add(url);              // e.g. the cleaned-up names are the same as the originals
+    try { consider(await getJSON(fetchFn, url)); anyOk = true; } catch (e) { lastErr = e; log('error', String(e && e.message || e)); }
     if (good()) break;
   }
   if (!anyOk) return { error: String(lastErr && lastErr.message || lastErr), searched: q.cleanTitle };
@@ -131,12 +133,13 @@ async function search(fetchFn, text, duration) {
   const list = await getJSON(fetchFn, `${API}/search?${P({ q: text })}`) || [];
   return list.filter((r) => r && !r.instrumental && (r.syncedLyrics || r.plainLyrics))
     .map((r) => ({ id: r.id, title: r.trackName, artist: r.artistName, album: r.albumName, duration: r.duration, synced: !!r.syncedLyrics }))
-    .sort((a, b) => (b.synced - a.synced) || (duration ? Math.abs(a.duration - duration) - Math.abs(b.duration - duration) : 0))
+    .sort((a, b) => (b.synced - a.synced) || (duration ? Math.abs((a.duration || 1e9) - duration) - Math.abs((b.duration || 1e9) - duration) : 0))
     .slice(0, 12);
 }
 async function getById(fetchFn, id) { const r = await getJSON(fetchFn, `${API}/get/${encodeURIComponent(id)}`); return r ? { synced: r.syncedLyrics || null, plain: !!r.plainLyrics } : null; }
 
 function register(ipcMain, app, net) {
+  UA = `Prismatica/${app.getVersion()} (desktop music visualizer; https://github.com/lunacrescens/prismatica)`;
   const dir = app.getPath('userData');
   const cacheDir = path.join(dir, 'lyrics-cache');
   logFile = path.join(dir, 'lyrics-log.txt');
